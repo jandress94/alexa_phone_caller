@@ -8,6 +8,15 @@ http://amzn.to/1LGWsLG
 """
 
 from __future__ import print_function
+from twilio.rest import Client
+
+account_sid = "AC284875795ba9b598a3adaf8f2cb3d537"
+auth_token = "8c26341a4b6abf4f6431c6b66ad7e97a"
+twilioClient = Client(account_sid, auth_token)
+
+emmaNum="+16319747038"
+jimNum="+18652083894"
+twilioNum="+18656354700"
 
 
 # --------------- Helpers that build all of the responses ----------------------
@@ -124,6 +133,7 @@ def get_color_from_session(intent, session):
     return build_response(session_attributes, build_speechlet_response(
         intent['name'], speech_output, reprompt_text, should_end_session))
 
+"""
 def make_call_response():
 
     session_attributes = {}
@@ -138,6 +148,29 @@ def make_call_response():
     should_end_session = True
     return build_response(session_attributes, build_speechlet_response(
         card_title, speech_output, reprompt_text, should_end_session))
+"""
+
+def make_call_response():
+    print("make_call_response")
+
+    session_attributes = {}
+    card_title = "Jim's Phone Caller"
+    
+    speech_output = "Ok, calling."
+
+    should_end_session = True
+
+    try:
+        call = twilioClient.api.account.calls.create(to=jimNum, from_=twilioNum, url="http://2a6c795b.ngrok.io")
+        return build_response(session_attributes, build_speechlet_response(card_title, speech_output, speech_output, should_end_session))
+    except Exception as e:
+        error_message = "I'm sorry, I had a problem making the call."
+        print("Error trying to make call: " + str(e))
+        return build_response(session_attributes, build_speechlet_response(card_title, error_message, error_message, should_end_session))
+    
+
+    
+
 
 
 # --------------- Events ------------------

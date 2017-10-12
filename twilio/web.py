@@ -6,7 +6,7 @@ app = Flask(__name__)
 @app.route("/", methods=['GET', 'POST'])
 def hello():
 	resp = VoiceResponse()
-	resp.say("Hello Emma! This is a message from Jim.")
+	resp.say("Hello Jim! This is your requested call.")
 
 	return str(resp)
 
