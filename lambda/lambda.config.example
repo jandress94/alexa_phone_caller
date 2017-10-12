@@ -1,0 +1,7 @@
+[Twilio API]
+account_sid: twilio_account_sid
+auth_token: twilio_auth_token
+script_url: url_where_the_twilml_is_found
+
+[Alexa Skill]
+skill_id: alexa_skill_id

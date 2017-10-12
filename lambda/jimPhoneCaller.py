@@ -9,14 +9,23 @@ http://amzn.to/1LGWsLG
 
 from __future__ import print_function
 from twilio.rest import Client
+import ConfigParser
+import urllib
 
-account_sid = "AC284875795ba9b598a3adaf8f2cb3d537"
-auth_token = "8c26341a4b6abf4f6431c6b66ad7e97a"
-twilioClient = Client(account_sid, auth_token)
+config = ConfigParser.RawConfigParser()
+config.read("lambda.config")
+
+account_sid = config.get("Twilio API", "account_sid")
+auth_token = config.get("Twilio API", "auth_token")
+twilio_script_url = config.get("Twilio API", "script_url")
+
+twilioClient = Client(account_sid, auth_token) 
 
 emmaNum="+16319747038"
 jimNum="+18652083894"
 twilioNum="+18656354700"
+
+alexaSkillId = config.get("Alexa Skill", "skill_id")
 
 
 # --------------- Helpers that build all of the responses ----------------------
@@ -133,22 +142,6 @@ def get_color_from_session(intent, session):
     return build_response(session_attributes, build_speechlet_response(
         intent['name'], speech_output, reprompt_text, should_end_session))
 
-"""
-def make_call_response():
-
-    session_attributes = {}
-    card_title = "Jim's Phone Caller"
-
-    # If the user either does not reply to the welcome message or says something
-    # that is not understood, they will be prompted again with this text.
-    reprompt_text = "Unfortunately, calling is not yet supported."
-    
-    speech_output = "Thanks for making a call with Jim's Phone Caller. " + reprompt_text
-
-    should_end_session = True
-    return build_response(session_attributes, build_speechlet_response(
-        card_title, speech_output, reprompt_text, should_end_session))
-"""
 
 def make_call_response():
     print("make_call_response")
@@ -161,16 +154,12 @@ def make_call_response():
     should_end_session = True
 
     try:
-        call = twilioClient.api.account.calls.create(to=jimNum, from_=twilioNum, url="http://2a6c795b.ngrok.io")
+        call = twilioClient.api.account.calls.create(to=jimNum, from_=twilioNum, url=twilio_script_url)
         return build_response(session_attributes, build_speechlet_response(card_title, speech_output, speech_output, should_end_session))
     except Exception as e:
         error_message = "I'm sorry, I had a problem making the call."
         print("Error trying to make call: " + str(e))
         return build_response(session_attributes, build_speechlet_response(card_title, error_message, error_message, should_end_session))
-    
-
-    
-
 
 
 # --------------- Events ------------------
@@ -236,8 +225,7 @@ def lambda_handler(event, context):
     print("event.session.application.applicationId=" +
           event['session']['application']['applicationId'])
 
-    if (event['session']['application']['applicationId'] !=
-            "amzn1.ask.skill.b4a3ddb8-c194-479e-8689-1acf4512efdc"):
+    if (event['session']['application']['applicationId'] != alexaSkillId):
         raise ValueError("Invalid Application ID")
 
     if event['session']['new']:

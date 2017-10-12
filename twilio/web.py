@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from twilio.twiml.voice_response import VoiceResponse
 
 app = Flask(__name__)
@@ -6,7 +6,8 @@ app = Flask(__name__)
 @app.route("/", methods=['GET', 'POST'])
 def hello():
 	resp = VoiceResponse()
-	resp.say("Hello Jim! This is your requested call.")
+	msg = request.args['message'] if 'message' in request.args else "Hello, this is the default message."
+	resp.say(msg)
 
 	return str(resp)
 
